@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マンション管理 修繕費計算システム</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>マンション管理 修繕費計算システム</h1>
+            <p>大規模修繕に向けた積立金と不足金を計算します</p>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <h2>基本情報入力</h2>
+
+                <div class="form-group">
+                    <label for="currentBalance">現在の積立金残高（円）</label>
+                    <input type="number" id="currentBalance" placeholder="例：5000000" min="0" step="10000">
+                </div>
+
+                <div class="form-group">
+                    <label for="monthlyReserve">月々の積立金額（円/戸）</label>
+                    <input type="number" id="monthlyReserve" placeholder="例：10000" min="0" step="1000">
+                </div>
+
+                <div class="form-group">
+                    <label for="unitCount">総戸数</label>
+                    <input type="number" id="unitCount" placeholder="例：50" min="1" step="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="yearlyRepair">年間小規模修繕費用（円）</label>
+                    <input type="number" id="yearlyRepair" placeholder="例：500000" min="0" step="10000">
+                </div>
+
+                <div class="form-group">
+                    <label for="majorRepairCost">大規模修繕予定費用（円）</label>
+                    <input type="number" id="majorRepairCost" placeholder="例：30000000" min="0" step="100000">
+                </div>
+
+                <div class="form-group">
+                    <label for="yearsUntilRepair">大規模修繕までの期間（年）</label>
+                    <input type="number" id="yearsUntilRepair" placeholder="例：5" min="1" max="30" step="1">
+                </div>
+
+                <button onclick="calculate()" class="calculate-btn">計算する</button>
+            </section>
+
+            <section class="result-section" id="resultSection" style="display: none;">
+                <h2>計算結果</h2>
+
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">現在の積立金残高</div>
+                        <div class="result-value" id="displayCurrentBalance">¥0</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">期間内の積立金総額</div>
+                        <div class="result-value" id="totalReserve">¥0</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">期間内の小規模修繕費用総額</div>
+                        <div class="result-value" id="totalRepairCost">¥0</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">大規模修繕時の予想積立金残高</div>
+                        <div class="result-value" id="projectedBalance">¥0</div>
+                    </div>
+
+                    <div class="result-item highlight">
+                        <div class="result-label">大規模修繕費用</div>
+                        <div class="result-value" id="displayMajorCost">¥0</div>
+                    </div>
+
+                    <div class="result-item highlight" id="shortageItem">
+                        <div class="result-label" id="shortageLabel">不足金額</div>
+                        <div class="result-value" id="shortage">¥0</div>
+                    </div>
+                </div>
+
+                <div class="additional-info" id="additionalInfo" style="display: none;">
+                    <h3>不足金を補うために必要な追加対策</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">追加月額積立金（全体）</div>
+                            <div class="info-value" id="additionalMonthly">¥0</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">追加月額積立金（1戸あたり）</div>
+                            <div class="info-value" id="additionalMonthlyPerUnit">¥0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>積立金推移グラフ</h3>
+                    <canvas id="reserveChart"></canvas>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 マンション管理 修繕費計算システム</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
