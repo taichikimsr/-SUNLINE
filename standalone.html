@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マンション管理 修繕費計算システム</title>
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 30px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+header p {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+main {
+    padding: 40px 30px;
+}
+
+.input-section,
+.result-section {
+    margin-bottom: 40px;
+}
+
+h2 {
+    color: #667eea;
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #667eea;
+}
+
+h3 {
+    color: #764ba2;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    margin-top: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+input[type="number"]::placeholder {
+    color: #999;
+}
+
+.calculate-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top: 10px;
+}
+
+.calculate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.calculate-btn:active {
+    transform: translateY(0);
+}
+
+.result-section {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 15px;
+    margin-top: 30px;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.result-item {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.result-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.result-item.highlight {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.result-label {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
+.result-item.highlight .result-label {
+    opacity: 0.95;
+}
+
+.result-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.result-item.shortage-negative {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.result-item.shortage-positive {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+.additional-info {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    border-left: 4px solid #f5576c;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.info-item {
+    padding: 15px;
+    background: #fff5f5;
+    border-radius: 8px;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.info-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #f5576c;
+}
+
+.chart-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+canvas {
+    max-height: 300px;
+}
+
+footer {
+    background: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    header {
+        padding: 30px 20px;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    main {
+        padding: 20px 15px;
+    }
+
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>マンション管理 修繕費計算システム</h1>
+            <p>大規模修繕に向けた積立金と不足金を計算します</p>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <h2>基本情報入力</h2>
+
+                <div class="form-group">
+                    <label for="currentBalance">現在の積立金残高（円）</label>
+                    <input type="number" id="currentBalance" placeholder="例：5000000" min="0" step="10000">
+                </div>
+
+                <div class="form-group">
+                    <label for="monthlyReserve">月々の積立金額（円/戸）</label>
+                    <input type="number" id="monthlyReserve" placeholder="例：10000" min="0" step="1000">
+                </div>
+
+                <div class="form-group">
+                    <label for="unitCount">総戸数</label>
+                    <input type="number" id="unitCount" placeholder="例：50" min="1" step="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="yearlyRepair">年間小規模修繕費用（円）</label>
+                    <input type="number" id="yearlyRepair" placeholder="例：500000" min="0" step="10000">
+                </div>
+
+                <div class="form-group">
+                    <label for="majorRepairCost">大規模修繕予定費用（円）</label>
+                    <input type="number" id="majorRepairCost" placeholder="例：30000000" min="0" step="100000">
+                </div>
+
+                <div class="form-group">
+                    <label for="yearsUntilRepair">大規模修繕までの期間（年）</label>
+                    <input type="number" id="yearsUntilRepair" placeholder="例：5" min="1" max="30" step="1">
+                </div>
+
+                <button onclick="calculate()" class="calculate-btn">計算する</button>
+            </section>
+
+            <section class="result-section" id="resultSection" style="display: none;">
+                <h2>計算結果</h2>
+
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">現在の積立金残高</div>
+                        <div class="result-value" id="displayCurrentBalance">¥0</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">期間内の積立金総額</div>
+                        <div class="result-value" id="totalReserve">¥0</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">期間内の小規模修繕費用総額</div>
+                        <div class="result-value" id="totalRepairCost">¥0</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">大規模修繕時の予想積立金残高</div>
+                        <div class="result-value" id="projectedBalance">¥0</div>
+                    </div>
+
+                    <div class="result-item highlight">
+                        <div class="result-label">大規模修繕費用</div>
+                        <div class="result-value" id="displayMajorCost">¥0</div>
+                    </div>
+
+                    <div class="result-item highlight" id="shortageItem">
+                        <div class="result-label" id="shortageLabel">不足金額</div>
+                        <div class="result-value" id="shortage">¥0</div>
+                    </div>
+                </div>
+
+                <div class="additional-info" id="additionalInfo" style="display: none;">
+                    <h3>不足金を補うために必要な追加対策</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">追加月額積立金（全体）</div>
+                            <div class="info-value" id="additionalMonthly">¥0</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">追加月額積立金（1戸あたり）</div>
+                            <div class="info-value" id="additionalMonthlyPerUnit">¥0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>積立金推移グラフ</h3>
+                    <canvas id="reserveChart"></canvas>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 マンション管理 修繕費計算システム</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+let reserveChart = null;
+
+function formatCurrency(amount) {
+    return '¥' + Math.round(amount).toLocaleString('ja-JP');
+}
+
+function validate() {
+    const currentBalance = parseFloat(document.getElementById('currentBalance').value) || 0;
+    const monthlyReserve = parseFloat(document.getElementById('monthlyReserve').value) || 0;
+    const unitCount = parseInt(document.getElementById('unitCount').value) || 1;
+    const yearlyRepair = parseFloat(document.getElementById('yearlyRepair').value) || 0;
+    const majorRepairCost = parseFloat(document.getElementById('majorRepairCost').value) || 0;
+    const yearsUntilRepair = parseInt(document.getElementById('yearsUntilRepair').value) || 0;
+
+    if (yearsUntilRepair <= 0) {
+        alert('大規模修繕までの期間を入力してください。');
+        return null;
+    }
+
+    if (monthlyReserve < 0 || currentBalance < 0 || yearlyRepair < 0 || majorRepairCost < 0) {
+        alert('金額は0以上の値を入力してください。');
+        return null;
+    }
+
+    if (unitCount <= 0) {
+        alert('戸数は1以上の値を入力してください。');
+        return null;
+    }
+
+    return {
+        currentBalance,
+        monthlyReserve,
+        unitCount,
+        yearlyRepair,
+        majorRepairCost,
+        yearsUntilRepair
+    };
+}
+
+function calculate() {
+    const data = validate();
+    if (!data) return;
+
+    const {
+        currentBalance,
+        monthlyReserve,
+        unitCount,
+        yearlyRepair,
+        majorRepairCost,
+        yearsUntilRepair
+    } = data;
+
+    // 計算
+    const monthlyReserveTotal = monthlyReserve * unitCount;
+    const totalReserve = monthlyReserveTotal * 12 * yearsUntilRepair;
+    const totalRepairCost = yearlyRepair * yearsUntilRepair;
+    const projectedBalance = currentBalance + totalReserve - totalRepairCost;
+    const shortage = majorRepairCost - projectedBalance;
+
+    // 結果を表示
+    document.getElementById('displayCurrentBalance').textContent = formatCurrency(currentBalance);
+    document.getElementById('totalReserve').textContent = formatCurrency(totalReserve);
+    document.getElementById('totalRepairCost').textContent = formatCurrency(totalRepairCost);
+    document.getElementById('projectedBalance').textContent = formatCurrency(projectedBalance);
+    document.getElementById('displayMajorCost').textContent = formatCurrency(majorRepairCost);
+
+    const shortageItem = document.getElementById('shortageItem');
+    const shortageLabel = document.getElementById('shortageLabel');
+    const shortageValue = document.getElementById('shortage');
+    const additionalInfo = document.getElementById('additionalInfo');
+
+    if (shortage > 0) {
+        // 不足がある場合
+        shortageLabel.textContent = '不足金額';
+        shortageValue.textContent = formatCurrency(shortage);
+        shortageItem.className = 'result-item highlight shortage-negative';
+
+        // 追加必要な積立金を計算
+        const monthsRemaining = yearsUntilRepair * 12;
+        const additionalMonthlyTotal = shortage / monthsRemaining;
+        const additionalMonthlyPerUnit = additionalMonthlyTotal / unitCount;
+
+        document.getElementById('additionalMonthly').textContent = formatCurrency(additionalMonthlyTotal);
+        document.getElementById('additionalMonthlyPerUnit').textContent = formatCurrency(additionalMonthlyPerUnit);
+
+        additionalInfo.style.display = 'block';
+    } else {
+        // 余剰がある場合
+        shortageLabel.textContent = '余剰金額';
+        shortageValue.textContent = formatCurrency(Math.abs(shortage));
+        shortageItem.className = 'result-item highlight shortage-positive';
+        additionalInfo.style.display = 'none';
+    }
+
+    // 結果セクションを表示
+    document.getElementById('resultSection').style.display = 'block';
+
+    // グラフを描画
+    drawChart(data, totalReserve, totalRepairCost, projectedBalance);
+
+    // スムーズにスクロール
+    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function drawChart(data, totalReserve, totalRepairCost, projectedBalance) {
+    const { currentBalance, monthlyReserve, unitCount, yearlyRepair, yearsUntilRepair } = data;
+
+    // 年ごとのデータを生成
+    const labels = ['現在'];
+    const balanceData = [currentBalance];
+    const monthlyReserveTotal = monthlyReserve * unitCount;
+
+    for (let year = 1; year <= yearsUntilRepair; year++) {
+        labels.push(`${year}年後`);
+        const accumulatedReserve = monthlyReserveTotal * 12 * year;
+        const accumulatedRepair = yearlyRepair * year;
+        const balance = currentBalance + accumulatedReserve - accumulatedRepair;
+        balanceData.push(balance);
+    }
+
+    const ctx = document.getElementById('reserveChart').getContext('2d');
+
+    // 既存のチャートを破棄
+    if (reserveChart) {
+        reserveChart.destroy();
+    }
+
+    reserveChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '予想積立金残高',
+                data: balanceData,
+                borderColor: 'rgb(102, 126, 234)',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return formatCurrency(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Enterキーで計算を実行
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('input[type="number"]');
+    inputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
+    });
+});
+    </script>
+</body>
+</html>
